@@ -1,0 +1,43 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'  # triggers on any tag starting with "v"
+
+permissions:
+  contents: write  # required to create GitHub releases and upload assets
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Create bin directory
+        run: mkdir -p bin
+
+      - name: Build Linux binary
+        run: GOOS=linux GOARCH=amd64 go build -o bin/thermistor-lut-gen-linux ./cmd/thermistor-gen
+
+      - name: Build Windows binary
+        run: GOOS=windows GOARCH=amd64 go build -o bin/thermistor-lut-gen-win.exe ./cmd/thermistor-gen
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          artifacts: |
+            bin/thermistor-lut-gen-linux
+            bin/thermistor-lut-gen-win.exe

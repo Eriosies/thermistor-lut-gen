@@ -1,0 +1,13 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Output directories
+output/
+.vscode/

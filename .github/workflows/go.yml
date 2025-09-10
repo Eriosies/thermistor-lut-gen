@@ -1,0 +1,41 @@
+name: Go CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  go-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Build Linux binary
+        run: GOOS=linux GOARCH=amd64 go build -o bin/thermistor-lut-gen-linux ./cmd/thermistor-gen
+
+      - name: Build Windows binary
+        run: GOOS=windows GOARCH=amd64 go build -o bin/thermistor-lut-gen.exe ./cmd/thermistor-gen
