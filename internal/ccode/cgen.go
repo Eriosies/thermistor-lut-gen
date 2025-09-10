@@ -13,7 +13,6 @@ import (
 	"github.com/Eriosies/thermistor-lut-gen/models"
 )
 
-// TODO: FIX STEINHART
 const resistanceMax float64 = 1e9
 const resistanceMin float64 = 0.1
 const arrayLinebreak int = 16
